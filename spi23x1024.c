@@ -28,6 +28,11 @@ Email: gao0006@auburn.edu
 #define SPI_MEM_NUMBER_OF_BITS 24       // 24-bit address
 #define SPI_MEM_MAX_SPEED_HZ 40000000   // Max SPI speed (40 MHz)
 #define SPI_MEM_DELAY_US 0              // Delay in microseconds
+#define SPI_MEM_WREN_CMD  0x06  // Write Enable
+#define SPI_MEM_WRITE_CMD 0x02  // Write Data Bytes
+#define SPI_MEM_READ_CMD  0x03  // Read Data Bytes
+#define SPI_MEM_RDSR_CMD  0x05  // Read Status Register
+
 
 // Global variables
 uint32_t mode;

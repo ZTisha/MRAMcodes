@@ -19,13 +19,18 @@ void spi_mem_write_from_csv(const char *filename) {
     while (fgets(line, sizeof(line), file)) {
         uint32_t address;
         uint8_t data;
+
+        // Read decimal/hex address and hex data correctly
         if (sscanf(line, "%d,0x%hhx", &address, &data) == 2) {
-            if (address <= SPI_MEM_MAX_ADDRESS) {
-                spi_mem_write_byte(address, data);
-                printf("Wrote 0x%02X to address %d\n", data, address);
-            } else {
-                printf("Address %d out of range\n", address);
+            if (address > SPI_MEM_MAX_ADDRESS) {  // Address range check
+                printf("Error: Address %d (0x%06X) out of range\n", address, address);
+                continue;  // Skip this line and move to the next
             }
+
+            spi_mem_write_byte(address, data);
+            printf("Wrote 0x%02X to address %d (0x%06X)\n", data, address, address);
+        } else {
+            printf("Invalid format: %s", line);
         }
     }
 
@@ -35,7 +40,7 @@ void spi_mem_write_from_csv(const char *filename) {
 // Main function
 int main() {
     // Initialize SPI
-    spi_mem_init(SPI_MEM_MAX_SPEED_HZ);
+    spi_mem_init(SPI_SPEED_HZ);
 
     // Write data from CSV file to MRAM
     spi_mem_write_from_csv("image.csv");

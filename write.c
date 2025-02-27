@@ -5,7 +5,7 @@
 
 // Constants
 #define SPI_MEM_MAX_ADDRESS 131071  // 17-bit address space (131,072 words)
-#define SPI_SPEED_HZ 10000000  // 10 MHz
+#define SPI_MEM_MAX_SPEED_HZ 10000000  // 10 MHz
 
 // Function to write data from CSV file to MRAM
 void spi_mem_write_from_csv(const char *filename) {

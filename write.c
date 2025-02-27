@@ -37,7 +37,7 @@ int main() {
     spi_mem_init(SPI_MEM_MAX_SPEED_HZ);
 
     // Write data from CSV file to MRAM
-    spi_mem_write_from_csv("output1.csv");
+    spi_mem_write_from_csv("image.csv");
 
     // Close SPI
     spi_mem_close();

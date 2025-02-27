@@ -40,7 +40,7 @@ void spi_mem_write_from_csv(const char *filename) {
 // Main function
 int main() {
     // Initialize SPI
-    spi_mem_init(SPI_SPEED_HZ);
+    spi_mem_init(SPI_MEM_MAX_SPEED_HZ);
 
     // Write data from CSV file to MRAM
     spi_mem_write_from_csv("image.csv");

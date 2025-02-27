@@ -27,6 +27,7 @@ Email: gao0006@auburn.edu
 #define SPI_MEM_DEVICE "/dev/spidev0.0" // SPI device
 #define SPI_MEM_MAX_SPEED_HZ 40000000   // Max SPI speed (40 MHz)
 #define SPI_MEM_DELAY_US 0              // Delay in microseconds
+#define SPI_MEM_MAX_ADDRESS 0x1FFFF     // 17-bit valid address range (128 KB)
 
 // MR10Q010 SPI Commands
 #define SPI_MEM_WREN_CMD  0x06  // Write Enable
@@ -95,11 +96,24 @@ void spi_mem_write_enable() {
 
     if (ioctl(fd, SPI_IOC_MESSAGE(1), &transfer) < 0) {
         perror("Error: Write Enable command failed");
+        return;
+    }
+
+    // Optional: Verify WEL is set before writing
+    uint8_t status = spi_mem_read_status_reg();
+    if (!(status & 0x02)) {  // WEL bit (bit 1) should be set
+        printf("Warning: Write Enable Latch (WEL) not set\n");
     }
 }
 
 // Write a byte to MRAM
 void spi_mem_write_byte(uint32_t addr, uint8_t data) {
+    // Check valid address range
+    if (addr > SPI_MEM_MAX_ADDRESS) {
+        printf("Error: Address 0x%06X out of range\n", addr);
+        return;
+    }
+
     // Enable write operations
     spi_mem_write_enable();
 
@@ -128,6 +142,12 @@ void spi_mem_write_byte(uint32_t addr, uint8_t data) {
 
 // Read a byte from MRAM
 uint8_t spi_mem_read_byte(uint32_t addr) {
+    // Check valid address range
+    if (addr > SPI_MEM_MAX_ADDRESS) {
+        printf("Error: Address 0x%06X out of range\n", addr);
+        return 0xFF;  // Return invalid data
+    }
+
     uint8_t tx_buffer[4] = {
         SPI_MEM_READ_CMD,       // Read command (0x03)
         (uint8_t)(addr >> 16),  // Upper 8 bits of address
@@ -135,12 +155,12 @@ uint8_t spi_mem_read_byte(uint32_t addr) {
         (uint8_t)(addr & 0xFF)  // Lower 8 bits of address
     };
 
-    uint8_t rx_buffer[5] = {0}; // Read buffer (last byte contains the data)
+    uint8_t rx_buffer[4] = {0}; // Read buffer
 
     struct spi_ioc_transfer transfer = {
         .tx_buf = (unsigned long)tx_buffer,
         .rx_buf = (unsigned long)rx_buffer,
-        .len = 5,  // Sending 4 bytes (command + address), receiving 5 bytes
+        .len = 4,  // Sending 4 bytes (command + address), receiving 1 byte
         .speed_hz = spi_mem_speed_hz,
         .delay_usecs = SPI_MEM_DELAY_US,
         .bits_per_word = 8,
@@ -150,7 +170,7 @@ uint8_t spi_mem_read_byte(uint32_t addr) {
         perror("Error: Read operation failed");
     }
 
-    return rx_buffer[4]; // Return the received data byte
+    return rx_buffer[3]; // Return the received data byte
 }
 
 // Read Status Register
@@ -172,22 +192,4 @@ uint8_t spi_mem_read_status_reg() {
     }
 
     return rx_buffer[1]; // Correctly return the status register value
-}
-
-// Main function for testing
-int main() {
-    spi_mem_init(10000000); // Initialize SPI at 10 MHz
-
-    uint32_t test_address = 0x000123; // Example address
-    uint8_t test_data = 0xAB;         // Example data to write
-
-    printf("Writing 0x%X to address 0x%X\n", test_data, test_address);
-    spi_mem_write_byte(test_address, test_data);
-
-    printf("Reading from address 0x%X\n", test_address);
-    uint8_t read_value = spi_mem_read_byte(test_address);
-    printf("Read value: 0x%X\n", read_value);
-
-    spi_mem_close(); // Close SPI device
-    return 0;
 }

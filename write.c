@@ -179,17 +179,23 @@ void spi_mem_write_from_csv(const char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    char line[256];
+   char line[256];
+    // Skip the header line (first line: "Address,Word")
+    fgets(line, sizeof(line), file);
+
     while (fgets(line, sizeof(line), file)) {
         uint32_t address;
         uint8_t data;
-        if (sscanf(line, "%d,0x%hhx", &address, &data) == 2) {
+        // Parse address (decimal) and data (hex without 0x)
+        if (sscanf(line, "%u,%2hhx", &address, &data) == 2) {
             if (address <= SPI_MEM_MAX_ADDRESS) {
                 spi_mem_write_byte(address, data);
-                printf("Wrote 0x%02X to address %d\n", data, address);
+                printf("Wrote 0x%02X to address %u\n", data, address);
             } else {
-                printf("Address %d out of range\n", address);
+                printf("Address %u out of range\n", address);
             }
+        } else {
+            printf("Failed to parse line: %s", line);
         }
     }
 

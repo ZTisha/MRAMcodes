@@ -132,12 +132,17 @@ void spi_mem_write_enable() {
 
     // 🔄 MODIFIED: Wrap SPI with GPIO CS control
     gpio_write(current_cs_gpio, 0);
+    usleep(5); //added delay before SPI transfer
     if (ioctl(fd, SPI_IOC_MESSAGE(1), &transfer) < 0) {
         perror("Error: Write Enable command failed");
         gpio_write(current_cs_gpio, 1);
         return;
     }
+    usleep(5);  //delay before deasserting CS
     gpio_write(current_cs_gpio, 1);
+
+    usleep(10);   //delay before Reading status (WEL Latch)
+    
 
     uint8_t status = spi_mem_read_status_reg();
     if (!(status & 0x02)) {

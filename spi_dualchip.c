@@ -25,9 +25,9 @@
 uint32_t mode = 0;
 int fd;
 uint64_t spi_mem_speed_hz;
-int current_cs_gpio = -1; // 🔄 MODIFIED: Track active chip-select GPIO
+int current_cs_gpio = -1; // 🔄 Track active chip-select GPIO
 
-// 🔄 MODIFIED: GPIO helper functions
+// 🔄 GPIO helper functions
 void gpio_export(int gpio) {
     char path[32];
     int f = open("/sys/class/gpio/export", O_WRONLY);
@@ -56,7 +56,7 @@ void gpio_write(int gpio, int value) {
     close(f);
 }
 
-// 🔄 MODIFIED: Accept chip-select GPIO
+// 🔄 Accept chip-select GPIO
 void spi_mem_init(uint64_t speed, int cs_gpio) {
     assert(speed <= SPI_MEM_MAX_SPEED_HZ);
     spi_mem_speed_hz = speed;

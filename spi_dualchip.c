@@ -95,6 +95,29 @@ void spi_mem_close() {
     if (current_cs_gpio >= 0) gpio_write(current_cs_gpio, 1);
 }
 
+uint8_t spi_mem_read_status_reg() {
+    uint8_t tx_buffer[2] = {SPI_MEM_RDSR_CMD, 0x00};
+    uint8_t rx_buffer[2] = {0};
+
+    struct spi_ioc_transfer transfer = {
+        .tx_buf = (unsigned long)tx_buffer,
+        .rx_buf = (unsigned long)rx_buffer,
+        .len = 2,
+        .speed_hz = spi_mem_speed_hz,
+        .delay_usecs = SPI_MEM_DELAY_US,
+        .bits_per_word = 8,
+    };
+
+    gpio_write(current_cs_gpio, 0); // 🔄 MODIFIED
+    if (ioctl(fd, SPI_IOC_MESSAGE(1), &transfer) < 0) {
+        perror("Error: Status Register read failed");
+    }
+    gpio_write(current_cs_gpio, 1); // 🔄 MODIFIED
+
+    return rx_buffer[1];
+}
+
+
 void spi_mem_write_enable() {
     uint8_t tx_buffer[1] = {SPI_MEM_WREN_CMD};
 
@@ -192,26 +215,4 @@ uint8_t spi_mem_read_byte(uint32_t addr) {
     gpio_write(current_cs_gpio, 1); // 🔄 MODIFIED
 
     return rx_buffer[0];
-}
-
-uint8_t spi_mem_read_status_reg() {
-    uint8_t tx_buffer[2] = {SPI_MEM_RDSR_CMD, 0x00};
-    uint8_t rx_buffer[2] = {0};
-
-    struct spi_ioc_transfer transfer = {
-        .tx_buf = (unsigned long)tx_buffer,
-        .rx_buf = (unsigned long)rx_buffer,
-        .len = 2,
-        .speed_hz = spi_mem_speed_hz,
-        .delay_usecs = SPI_MEM_DELAY_US,
-        .bits_per_word = 8,
-    };
-
-    gpio_write(current_cs_gpio, 0); // 🔄 MODIFIED
-    if (ioctl(fd, SPI_IOC_MESSAGE(1), &transfer) < 0) {
-        perror("Error: Status Register read failed");
-    }
-    gpio_write(current_cs_gpio, 1); // 🔄 MODIFIED
-
-    return rx_buffer[1];
 }

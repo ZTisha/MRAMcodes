@@ -64,9 +64,8 @@ void mram_write_enable() {
     if (ioctl(fd, SPI_IOC_MESSAGE(1), &t) < 0) {
         perror("WREN failed");
     }
-}
-
 usleep(10); // short wait to ensure WEL is latched
+}
 
 // Write a single byte to a given MRAM address
 void mram_write_byte(uint32_t addr, uint8_t data) {

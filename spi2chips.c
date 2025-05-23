@@ -34,13 +34,13 @@ void spi_open(const char *device) {
         exit(EXIT_FAILURE);
     }
 
-    uint32_t mode = SPI_MODE_0; // SPI Mode 0 (CPOL=0, CPHA=0)
+    __u32 mode = SPI_MODE_0; // SPI Mode 0 (CPOL=0, CPHA=0)
     if (ioctl(fd, SPI_IOC_WR_MODE32, &mode) < 0) {
         perror("SPI mode set failed");
         exit(EXIT_FAILURE);
     }
-
-    if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &SPI_SPEED_HZ) < 0) {
+    __u32 speed = SPI_SPEED_HZ;
+    if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed) < 0) {
         perror("SPI speed set failed");
         exit(EXIT_FAILURE);
     }
@@ -64,7 +64,7 @@ void mram_write_enable() {
     if (ioctl(fd, SPI_IOC_MESSAGE(1), &t) < 0) {
         perror("WREN failed");
     }
-usleep(10); // short wait to ensure WEL is latched
+// usleep(10); // short wait to ensure WEL is latched
 }
 
 // Write a single byte to a given MRAM address

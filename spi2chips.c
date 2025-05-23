@@ -66,6 +66,8 @@ void mram_write_enable() {
     }
 }
 
+usleep(10); // short wait to ensure WEL is latched
+
 // Write a single byte to a given MRAM address
 void mram_write_byte(uint32_t addr, uint8_t data) {
     if (addr >= MRAM_SIZE) return; // Ignore out-of-bounds access

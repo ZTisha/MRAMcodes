@@ -9,6 +9,8 @@
 
 #define MRAM_SIZE 131072               // 128KB MRAM size
 #define CSV_FILE "image.csv"           // Input CSV file name
+//#define SPI_DEV1 "/dev/spidev0.0"   //Chip 1
+//#define SPI_DEV2 "/dev/spidev0.1"   //Chip 2
 
 // Load address-data pairs from CSV file into memory buffer
 int load_csv(uint8_t *buffer, const char *filename) {
@@ -19,12 +21,15 @@ int load_csv(uint8_t *buffer, const char *filename) {
     }
 
     char line[64];
+
+    fgets(line, sizeof(line), file); //discards first line
+
     while (fgets(line, sizeof(line), file)) {
         uint32_t addr;
         uint8_t value;
 
         // Parse each line in format: address,0xDATA
-        if (sscanf(line, "%u,0x%hhx", &addr, &value) == 2) {
+        if (sscanf(line, "%x,%2hhx", &addr, &value) == 2) {
             if (addr < MRAM_SIZE) {
                 buffer[addr] = value; // Store parsed value into buffer
             } else {

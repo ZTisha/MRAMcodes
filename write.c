@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "spi_dualchip.c" // Provides SPI functions for MRAM access
+#include "spi2chips.c" // Provides SPI functions for MRAM access
 
 #define MRAM_SIZE 131072               // 128KB MRAM size
 #define CSV_FILE "image.csv"           // Input CSV file name

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "spi_dualchip.c"  // Uses hardware chip select (spidev0.0, spidev0.1)
+#include "spi2chips.c"  // Uses hardware chip select (spidev0.0, spidev0.1)
 
 #define MRAM_SIZE 131072         // 128 KB per chip
 #define SPI_DEV1 "/dev/spidev0.0"

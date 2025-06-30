@@ -23,7 +23,7 @@ void mram_write_byte(uint32_t addr, uint8_t data) {
 int main() {
     if (spi_init() < 0) return 1;
 
-    FILE *fp = fopen("Aubie_1024.csv", "r");
+    FILE *fp = fopen("Image.csv", "r");
     if (!fp) {
         perror("Could not open input CSV file");
         spi_close();
@@ -45,6 +45,6 @@ int main() {
     fclose(fp);
     spi_close();
 
-    printf("MRAM write complete: Aubie_1024.csv written to chip\n");
+    printf("MRAM write complete: Image.csv written to chip\n");
     return 0;
 }
